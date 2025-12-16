@@ -9,8 +9,9 @@
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <div class="booking-container">
+    <div class="booking-container"><!--CalendarContainer-->
         <h2>Make your reservation</h2>
+
     <div class="calendar">
         <div class="calendar-header">
             <button >Previous</button>
@@ -21,11 +22,66 @@
    </div>
 </div>    
 
-<div class="time-slots">
+<div class="time-slots"><!--time slot container-->
     <h3>Available Time Slots for<span id="selected-date">Select a date</span></h3>
         <div id="time-slots-container">
         </div>
     </div>
+
+    <!--Login Form-->
+    <form action="#" class="login-form" autocomplete="off" id="login-form">
+        <div class="input-box"><!--Email row-->
+            <input type="text" class="input-field" id="log-email" required>
+            <label for="log-email" class="label">Email</label>
+        </div>  
+    <div class="input-box"><!--Name row-->
+        <input type="text" class="input-field" id="log-name" required>
+        <label for="log-name" class="label">Name</label>
+    </div>      
+    <div class="form-cols"><!--Cheek box-->
+        <div class="col-1">
+            <input type="checkbox" id="remember">
+            <label for="remember">Remember Me</label>
+        </div>
+            <div class="col-2"><!--Link to recovery page-->
+                <a href="#">Forgot password</a>
+            </div>
+        </div>
+    <div class="input-box"><!--form for registration-->
+        <button class="btn-submit" id="login-btn">Login</button>
+    </div>
+    <div class="switch-form"><!--btn for registration form-->
+        <span>Dont have an account?<a href="#" onclick="regFormFunction()">Register</a></span>
+    </div>
+    </form>
+    <!--Registration Form-->
+    <form action="#" class="reg-form" autocomplete="off" id="reg-form" style="display: none;">
+        <div class="input-box "><!--user name col-->
+            <input type="text" class="input-field" id="reg-name"  name="name" required>
+            <label for="reg-name" class="label">Guest Name</label>
+        </div>
+        <div class="input-box"><!--email col-->
+            <input type="text" class="input-field" id="reg-email" required>
+            <label for="reg-email" class="label">Email</label>
+        </div>
+        <div class="input-box"><!--guest phone number-->
+            <input type="number" class="input-field" id="reg-num" required>
+            <label for="reg-num" class="label">Phone number</label>
+        </div>
+        <div class="form-cols">
+        <div class="col-1">
+            <input type="checkbox" id="agree"><!--Checkbox for terms & agrements-->
+            <label for="agree">I agree to the terms and conditions</label>
+        </div>
+            <div class="col-2"></div>
+        </div>
+        <div class="input-box"><!--button for registration-->
+            <button type="button" class="btn-submit" id="reg-btn">Register</button>
+        </div>
+        <div class="switch-form"><!--Login form-->
+            <span>Already have a account<a href="#" onclick="showLoginForm()">Log in</a></span>
+        </div>
+    </form>
 <div class="booking-summary" id="booking-summary" style="display:none;">
     <h3>Booking Summary</h3>
         <p>Date:<span id="summary-date"></span></p> 

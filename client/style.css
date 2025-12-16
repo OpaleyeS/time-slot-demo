@@ -113,3 +113,70 @@ button:disabled{
     cursor: not-allowed;
 
 }
+/*Form Style*/
+.login-form, .reg-form{
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    padding: 20px;
+    margin: 20px 0;
+    background: white;
+}
+
+.input-box{
+    position: relative;
+    margin-bottom: 20px;
+}
+
+.input-field:focus{
+    outline:none;
+    border-color:#007bff;
+}
+.label{
+    position: absolute;
+    left: 10px;
+    top:10px;
+    color: #999;
+    transition: all 0.3s;
+    pointer-events: none;
+}
+.input-field:focus + .label,
+.input-field:not(:placeholder-shown) + .label{
+    top:-10px;
+    left:5px;
+    font-size: 12px;
+    color: #007bff;
+    background:white;
+    padding: 0 5px;
+}
+
+.form-cols{
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+}
+.switch-form{
+    text-align:center;
+    margin-top:15px;
+}
+.status-message{
+ padding: 10px;
+ margin: 10px 0;
+ border-radius: 4px;
+ display: none;
+}
+
+.status-message.success{
+    background: #d4edda;
+    color: #155724;
+    border:1px solid #c3e6cb;
+}
+.status-message.error{
+    background: #f8d7da;
+    color: #721c29;
+    border: 1px solid #f5c6cb;
+}
+.loading{
+    opacity: 0.7;
+    pointer-events: none;
+}
