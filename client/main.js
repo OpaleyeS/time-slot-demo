@@ -10,7 +10,7 @@ return await response.json();
 async createBooking(bookingData){
   const response = await fetch(`${API_BASE_URL}/bookings`, {
     method:'POST',
-    header:{'Content-Type': `application/json`},
+    headers:{'Content-Type': `application/json`},
     body: JSON.stringify(bookingData)
   });
   return await response.json();

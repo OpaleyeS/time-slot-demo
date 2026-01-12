@@ -1,10 +1,14 @@
+require('dotenv').config();
+console.log('Checking environment...');
+console.log('MONGO_URI: exists?', !!process.env.MONGO_URI);
+console.log('MONGO_URI value:', process.env.MONGO_URI || 'not set');
+
 const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
 const app = express();
-require('dotenv').config();
 
-const MONGODB_URI = process.env.MONGODB_URI;
+const MONGO_URI = process.env.MONGO_URI;
 const PORT = process.env.PORT || 3000;
 //Middleware
 app.use(cors());
@@ -12,12 +16,11 @@ app.use(express.json()); //parses json bodies
 app.use(express.static('public'));//serves frontend form public folde
 
 //MongoDb Connection 
-mongoose.connect(MONGODB_URI,{
-    useNewUrlParser:true,
-    useUnifiedTopology: true
-})
+mongoose.connect(MONGO_URI)
     .then(() => console.log(`Connected to MongoDB`))
-    .catch(err => console.error(`MongoDB connection error: ${err}`));
+    .catch(err => {
+         console.error(`MongoDB connection error: ${err}`);
+    });
 
     //Define Schemas
     const bookingSchema = new mongoose.Schema({
@@ -62,10 +65,10 @@ mongoose.connect(MONGODB_URI,{
         }
     });
 //get availability 
-app.get('/api/availablity/:date/:start/:end', async(req, res) => {
+app.get('/api/availability/:date/:start/:end', async(req, res) => {
     try{
         const date = new Date(req.params.date);
-        const startTime =newDate(req.params.start);
+        const startTime =new Date(req.params.start);
         const endTime = new Date(req.params.end);
         const conflictingBooking = await Booking.findOne({
             bookingDate: date,
@@ -73,7 +76,7 @@ app.get('/api/availablity/:date/:start/:end', async(req, res) => {
                 {startTime:{ $lt:endTime}, endTime:{$gt:startTime}}
             ]
         });
-        res.jason({available: !conflictingBooking});
+        res.json({available: !conflictingBooking});
     }catch(error){
         res.status(500).json({success:false, message: error.message});
     }
