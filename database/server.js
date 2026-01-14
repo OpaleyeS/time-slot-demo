@@ -144,6 +144,38 @@ app.post('/api/user/login', async (req, res)=>{
         });
     }
 });
+//connection to admin.js
+app.get('/api/admin/bookings', async(req, res) =>{
+    try{
+        const {startDate, endDate} = req.query;
+        const bookings = await Booking.find({
+            bookingDate:{
+                $gte: new Date(startDate),
+                $lte: new Date(endPoint)
+            }
+        });
+        res.json({sucess:true, bookings});
+}catch (error){
+    res.status(500).json({
+        success:false,
+        message:error.message
+    });
+}
+});
+
+app.put('/api/admin/bookings/:id', async(req, res) => {
+    try{
+        const booking = awaitBooking.findByIdAndUpdate(
+            req.params.id,
+            {status: req.body.status},
+            {new:true}
+        );
+        res.json({success: true, booking});
+    }catch(error){
+        res.status(500).json({ success:false, message: error.message});
+        }    
+    });
+  
 
 app.listen(PORT, () =>{
     console.log(`Server running on port ${PORT}`);
