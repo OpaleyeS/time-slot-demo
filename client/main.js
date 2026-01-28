@@ -202,15 +202,12 @@ async function handleRegistration(){//gets inputs from Registrationforms
     alert('You must agree to the terms and conditions.');
     return;
   }
-    if(!agree){
-      alert('You must agree to terms and conditions.');
-      return;
-    }
+
+  const regBtn = document.getElementById('reg-btn');
+  const originalText = regBtn.textContent;
 
   try{
     //Show loading state
-    const regBtn = document.getElementById('reg-btn');
-    const originalText = regBtn.textContent;
     regBtn.textContent = 'Registering...';
     regBtn.disabled = true;
     // create thee object for mongoDB Atlas
@@ -238,7 +235,7 @@ async function handleRegistration(){//gets inputs from Registrationforms
     alert(' Please try again.');
   }finally{
     //Reset button state
-    const regBtn = document.getElementById('reg-btn');
+    
     regBtn.textContent = originalText;
     regBtn.disabled = false;
   }
