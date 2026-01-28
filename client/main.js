@@ -1,6 +1,7 @@
 const API_BASE_URL = 'http://localhost:3000/api';
 
-const API = { async checkAvailability(data, startTime, endTime){
+const API = { 
+  async checkAvailability(data, startTime, endTime){
   const response = await fetch(
     `${API_BASE_URL}/availability/${data.toISOString()}/${startTime.toISOString()}/${endTime.toISOString()}`
 );
@@ -10,12 +11,12 @@ return await response.json();
 async createBooking(bookingData){
   const response = await fetch(`${API_BASE_URL}/bookings`, {
     method:'POST',
-    headers:{'Content-Type': `application/json`},
+    headers: { 'Content-Type': `application/json` },
     body: JSON.stringify(bookingData)
   });
   return await response.json();
 },
-//user reg
+//user registration
 async registerUser(userData){
   const response = await fetch(`${API_BASE_URL}/user/register`,{
     method:'POST',
@@ -28,63 +29,13 @@ async registerUser(userData){
 async loginUser(credentials){
   const response = await fetch(`${API_BASE_URL}/user/login`, {
     method:'POST',
-    header:{'Content-Type':'application/json'},
+    headers:{'Content-Type':'application/json'},
     body:JSON.stringify(credentials)
   })
   return await response.json();
 }
 };
 
-//Booking function 
-async function confirmBooking(){
-  if(!selectedDate || !selectedTimeSlot || !formData.registration.name){
-    alert('Please complette all required fields.');
-    return;
-  }
-//check if time slot available
-const availability = await API.checkAvailability(
-  selectedDate,
-  selectedTimeSlot.start,
-  selectedTimeSlot.end
-);
-
-if(!availability.available){
-  alert('This time slot is no longer availalble.Please choose another.');
-  return;
-}
-// booking object
-const bookingData = {
-  guestName: formData.registration.name,
-  guestEmail: formData.registration.email,
-  guestPhone: formData.registration.phone,
-  bookingDate:selectedDate,
-  startTime:selectedTimeSlot.start,
-  endTime:selectedTimeSlot.end
-};
-
-try{
-  //save to MOngoDB
-  const result = await API.createBooking(bookingData);
-  if(result.success){
-    alert(`
-      Booking confirmed
-      \nGuest:${formData.registration.name}
-      \nEmail:${formData.registration.email}
-      \nPhone:${formData.registration.phone}
-      \nDate:${selectedDate.toDateString()}
-      \nTime:${DateUtils.formatTime(selectedTimeSlot.start)}-
-      ${DateUtils.formatTime(selectedTimeSlot.end)}
-      \nBooking ID:${result.bookingId}
-      `);
-      resetBooking();
-  }else{
-    alert('Booking failed:' + result.message);
-  }
-}catch (error){
-  console.error('Booking error:',error);
-  alert('An error occurred. Please try again');
-}
-}
 // Calendar State
 let currentDate = new Date();//tracs what month/year is currently being displayed
 let selectedDate = null;//stores the date selected
@@ -199,8 +150,17 @@ function showRegistrationForm(){
   document.getElementById('login-form').style.display = 'none';
   document.getElementById('reg-form').style.display ='block';
   document.getElementById('booking-summary').style.display = 'none';
+    if(formData.registration.name){
+      document.getElementById('reg-name').value = formData.registration.name;
+    }
+    if(formData.registration.email){
+      document.getElementById('reg-email').value = formData.registration.email; 
+    }
+    if(formData.registration.phone){
+      document.getElementById('reg-num').value = formData.registration.phone;
+    }
 }
-
+//login form
 function showLoginForm(){
   document.getElementById('reg-form').style.display = 'none';
   document.getElementById('login-form').style.display ='block';
@@ -226,20 +186,63 @@ function handleLogin(){
     }
 }    
 
-function handleRegistration(){//gets inputs from Registrationforms
-  const name = document.getElementById('reg-name').value;
-  const email = document.getElementById('reg-email').value;
-  const phone = document.getElementById('reg-num').value;
+async function handleRegistration(){//gets inputs from Registrationforms
+  const name = document.getElementById('reg-name').value.trim();
+  const email = document.getElementById('reg-email').value.trim();
+  const phone = document.getElementById('reg-num').value.trim();
   const agree = document.getElementById('agree').checked;
 
-  //Store from data
-  formData.registration = { name, email, phone, agree};
 
-  console.log('Registration attempt:', formData.registration);
-    alert('Registration would process here');
-    //Afterregform , show booking summary 
-    showBookingSummary();
-} 
+  if(!name || !email || !phone){
+    alert('Please fill in all required fields.');
+    return;
+  }
+
+  if(!agree){
+    alert('You must agree to the terms and conditions.');
+    return;
+  }
+    if(!agree){
+      alert('You must agree to terms and conditions.');
+      return;
+    }
+
+  try{
+    //Show loading state
+    const regBtn = document.getElementById('reg-btn');
+    const originalText = regBtn.textContent;
+    regBtn.textContent = 'Registering...';
+    regBtn.disabled = true;
+    // create thee object for mongoDB Atlas
+    const userData = {
+      name: name,
+      email: email,
+      phone: phone
+    };
+    console.log('Sending to DataBase:', userData);
+    //Save form info to Database
+    const result = await API.registerUser(userData);
+    if(result.success){
+      //Store in local form Data
+      formData.registration = { name, email, phone, agree};
+      alert(`Registration successful!:${result.userId}`);
+      //Show booking summary if date n time selected
+      if(selectedDate && selectedTimeSlot){ 
+        showBookingSummary();
+      }
+  }else{
+    alert(`Registration failed: ${result.message}`);
+  }
+} catch(error){
+    console.error('Registration error:', error);
+    alert(' Please try again.');
+  }finally{
+    //Reset button state
+    const regBtn = document.getElementById('reg-btn');
+    regBtn.textContent = originalText;
+    regBtn.disabled = false;
+  }
+}
 
 // Time slot generation- creating available time slots based on hrs
 function generateTimeSlots(startTime, endTime, slotDuration) {
@@ -435,27 +438,60 @@ function showBookingSummary() {
 
 // Confirm booking- finalize the reservation
  async function confirmBooking() {
-  if (!selectedDate || !selectedTimeSlot) return;//Safty check
+  if (!selectedDate || !selectedTimeSlot) {
+    alert("please select time slot");
+       return;//Safty check
+  }
   //Check if  user is registered or login
   if(!formData.registration.name || formData.registration.name.trim()===''){
     alert('please register to compleate your reservation');
     showRegistrationForm();
   return;
   }
+  //Check if time is availbale\
+  const availability = await API.checkAvailability(
+    selectedDate,
+    selectedTimeSlot.start,
+    selectedTimeSlot.end
+  );
 
-  //crete confirmation message
-  const bookingDetails = `
-Booking confirmed!
-Guest:${formData.registration.name}
-Email:${formData.registration.email}
-Phone:${formData.registration.phone}
-Date: ${selectedDate.toDateString()}
-Time: ${DateUtils.formatTime(selectedTimeSlot.start)} - ${DateUtils.formatTime(selectedTimeSlot.end)}
-  `.trim();
-  
-  alert(bookingDetails);//Show configuration popup
-  resetBooking();//Clear selections and reset interface
-}
+  if(!availability.available){
+    alert('This time slot is not available. Please choose another time slot');
+    return;
+  }
+
+  //Create booking Obj
+const bookingData = {
+  guestName: formData.registration.name,
+  guestEmail: formData.registration.email,
+  guestPhone: formData.registration.phone,
+  bookingDate: selectedDate,
+  startTime: selectedTimeSlot.start,
+  endTime: selectedTimeSlot.end
+};
+
+try{
+  //save to database
+  const result = await API.createBooking(bookingData);
+  if(result.success){
+    alert(
+      `Booking confirmed!
+      \nGuest:${formData.registration.name}
+      \nEmail:${formData.registration.email}
+      \nPhone:${formData.registration.phone}
+      \nDate: ${selectedDate.toDateString()}
+      \nTime: ${DateUtils.formatTime(selectedTimeSlot.start)} - ${DateUtils.formatTime(selectedTimeSlot.end)}
+      \nBooking ID: ${result.bookingId}
+   `);  
+   resetBooking();
+    }else{
+      alert('Booking failed: ' + result.message);
+        }
+      }catch(error){
+          console.error('Booking error:', error);
+            alert('Error.Please try again');
+      }
+    }   
 //Reset system- clear all selections and return to initial state
 function resetBooking() {
   selectedDate = null;

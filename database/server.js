@@ -1,19 +1,19 @@
 require('dotenv').config();
-console.log('Checking environment...');
+/*console.log('Checking environment...');
 console.log('MONGO_URI: exists?', !!process.env.MONGO_URI);
-console.log('MONGO_URI value:', process.env.MONGO_URI || 'not set');
+console.log('MONGO_URI value:', process.env.MONGO_URI || 'not set');*/
 
 const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
 const app = express();
 
-const MONGO_URI = process.env.MONGO_URI;
+const MONGO_URI = process.env.MONGO_URI || "mongodb://localhost:27017/bookingDB";
 const PORT = process.env.PORT || 3000;
 //Middleware
 app.use(cors());
 app.use(express.json()); //parses json bodies
-app.use(express.static('public'));//serves frontend form public folde
+app.use(express.static('.'));//serves frontend form public folde
 
 //MongoDb Connection 
 mongoose.connect(MONGO_URI)
@@ -144,14 +144,38 @@ app.post('/api/user/login', async (req, res)=>{
         });
     }
 });
-//connection to admin.js
-app.get('/api/admin/bookings', async(req, res) =>{
+
+app.get('/api/reservations/:year/:month', async(req, res) =>{
     try{
+        const year = parseInt(req.params.year);
+        const month = parseInt(req.params.month) - 1;
+
+        const startDate = new Date(year, month, 1);
+        const endDate = new Date(year, month + 1, 0);
+
+        const bookings = await Booking.find({
+            bookingDate:{
+                $gte: startDate,
+                $lte: endDate
+            }
+        });
+      res.json({success: true, bookings});  
+    }catch (error){
+        res.status(500).json({
+            success:false,
+            message: error.message
+        });
+    }
+}) ;
+
+//connection to admin.js
+app.get('/api/admin/bookings', async(req, res) => {
+    try {
         const {startDate, endDate} = req.query;
         const bookings = await Booking.find({
             bookingDate:{
                 $gte: new Date(startDate),
-                $lte: new Date(endPoint)
+                $lte: new Date(endDate)
             }
         });
         res.json({sucess:true, bookings});
@@ -165,7 +189,7 @@ app.get('/api/admin/bookings', async(req, res) =>{
 
 app.put('/api/admin/bookings/:id', async(req, res) => {
     try{
-        const booking = awaitBooking.findByIdAndUpdate(
+        const booking = await Booking.findByIdAndUpdate(
             req.params.id,
             {status: req.body.status},
             {new:true}
@@ -176,7 +200,6 @@ app.put('/api/admin/bookings/:id', async(req, res) => {
         }    
     });
   
-
 app.listen(PORT, () =>{
     console.log(`Server running on port ${PORT}`);
 });

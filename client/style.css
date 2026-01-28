@@ -127,6 +127,16 @@ button:disabled{
     margin-bottom: 20px;
 }
 
+.input-field{
+    width:100%;
+    padding: 12px 10px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 16px;
+    box-sizing: border-box;
+   
+}
+
 .input-field:focus{
     outline:none;
     border-color:#007bff;
