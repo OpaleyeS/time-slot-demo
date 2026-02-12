@@ -24,11 +24,51 @@
 <div class="time-slots"><!--time slot container-->
 
         <div id="time-slots-container">
+            <p class="no-reservations-message">
+                Select a date on the calender to view reservations
+            </p>
         </div>
     </div>
 </div>
+
+<template id="reservation-badge-template">
+    <span class="reservation-badge"></span>
+</template>
+<template id="reservation-card-template">
+    <div class="reservation-card"> 
+        <div class="reservation-card-header">
+            <span class="reservation-number"></span>
+            <span class="guest-name"></span>
+            <span class="reservation-status"></span>
+        </div>
+        <div class="reservation-card-body">
+            <div class="reservation-time">
+                <span class="time-label"></span>
+                <span class="time-value"></span>
+            </div>
+            <div class="reservation-contact">
+                <div class="contact-email"></div>
+                <div class="contact-phone"></div>
+            </div>
+        </div>
+    </div>
+</template>
+<template id="reservation-summary-template">
+    <div class="reservation-summary">
+        <span class="total-count"></span>
+        <button class="export-btn">Export</button>
+</div>
+</template>
+<template id="date-header-template">
+    <h3 class="reservation-date-header"></h3>
+</template>
+
+<template id="cards-container-template">
+    <div class="reservation-cards-container"></div>
+</template>
 
 <script src="admin.js"></script>
 </body>
 
 </html>
+

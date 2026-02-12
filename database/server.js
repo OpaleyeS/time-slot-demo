@@ -178,7 +178,7 @@ app.get('/api/admin/bookings', async(req, res) => {
                 $lte: new Date(endDate)
             }
         });
-        res.json({sucess:true, bookings});
+        res.json({success:true, bookings});
 }catch (error){
     res.status(500).json({
         success:false,
@@ -202,4 +202,45 @@ app.put('/api/admin/bookings/:id', async(req, res) => {
   
 app.listen(PORT, () =>{
     console.log(`Server running on port ${PORT}`);
+});
+//gathering form info 
+app.get(`/api/admin/reservations/:year/:month`, async(req, res) => {
+    try{ 
+        const year = parseInt(req.params.year);
+        const month = parseInt(req.params.month)-1;
+
+        const startDate = new Date(year, month, 1);
+        const endDate = new Date(year, month + 1, 0);
+
+        const bookings = await Booking.find({
+            bookingDate:{
+                $gte: startDate, 
+                $lte: endDate
+            }
+        }).sort({ bookingDate: 1, startTime: 1})//sorting by date and time
+            console.log(`Found${bookings.length}bookings for ${year}/${month +1}`);//helpfull with debuging
+            res.json({
+                success: true, 
+                count: bookings.length,
+                bookings: bookings.map(booking => ({
+                    id: booking._id, 
+                    guestName: booking.guestName, 
+                    guestEmail: booking.guestEmail,
+                    guestPhone: booking.guestPhone,
+                    bookingDate: booking.bookingDate, 
+                    startTime: booking.startTime, 
+                    endTime: booking.endTime, 
+                    status: booking.status,
+                    formattedDate: booking.bookingDate.toLocaleDateString('en-US'),
+                    formattedStartTime: booking.endTime.toLocaleTimeString('en-US', {hour: '2-digit',minute: '2-digit'}),
+                    formatedEndTime: booking.endTime.toLocaleDateString('en-US', {hour:'2-digit', minute: '2-digit'})
+                }))
+            });
+    }catch (error){
+        console.error(`Error fetching admin reservations:`, error);
+            res.status(500).json({
+                success:false,
+                message:error.message
+            });
+    }
 });
