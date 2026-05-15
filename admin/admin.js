@@ -10,7 +10,7 @@ return await response.json();
 async getReservationsForMonth(year, month) {
   try{
     const response = await fetch(
-    `${API_BASE_URL}/reservations/${year}/${month}`
+    `${API_BASE_URL}/admin/reservations/${year}/${month}`
   );
   if(!response.ok){
     throw new Error(`HTTP error! status: ${response.status}`);
@@ -49,7 +49,7 @@ const elements = {
 const templates = {
   reservationBadge: document.getElementById('reservation-badge-template'),//template for the badge that shows number of reservations on a day
   reservationCard: document.getElementById('reservation-card-template'),//template for individual reservation details
-  reervationSummary: document.getElementById('booking-summary'),// the summary section that apears after selection 
+  reservationSummary: document.getElementById('reservation-summary-template'),// the summary section that apears after selection 
   dateHeader: document.getElementById('date-header-template'),//displays the selected date above the time slots 
   cardsContainer: document.getElementById('cards-container-template')//container for reservation cards in summary
 };
@@ -196,11 +196,10 @@ function createNextMonthDays() {
   
   if (daysSoFar < totalCells) {
     for (let day = 1; day <= totalCells - daysSoFar; day++) {
-      createDayElement(day, 'other-month');// grays out , not clickable
-        const date = new Date(currentDate.getFullYear(), currentDate.getMonth() + 1, day);
-
+      const dayElement = createDayElement(day, 'other-month');
+      const date = new Date(currentDate.getFullYear(), currentDate.getMonth() + 1, day);
+      const dayReservations = getReservationsForDate(date);
         //check to see if there are reservations on this date
-        const dayReservations = getReservationsForDate(date);
           if(dayReservations.length > 0){
             addReservationIndicator(dayElement, dayReservations.length);
           }
@@ -301,7 +300,7 @@ function showReservationsForDate(date, reservations) {
   });
 elements.timeSlotsContainer.appendChild(cardsContainer);
    }
-   if(templates.reervationSummary){
+   if(templates.reservationSummary){
       const summary = templates.reervationSummary.content.cloneNode(true).querySelector('.reservation-summary');
       summary.querySelector('.total-count').textContent = `Total : ${reservations.length}reservation(s)`;
         const exportBtn = summary.querySelector('.export-btn');

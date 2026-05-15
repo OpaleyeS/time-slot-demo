@@ -145,29 +145,6 @@ app.post('/api/user/login', async (req, res)=>{
     }
 });
 
-app.get('/api/reservations/:year/:month', async(req, res) =>{
-    try{
-        const year = parseInt(req.params.year);
-        const month = parseInt(req.params.month) - 1;
-
-        const startDate = new Date(year, month, 1);
-        const endDate = new Date(year, month + 1, 0);
-
-        const bookings = await Booking.find({
-            bookingDate:{
-                $gte: startDate,
-                $lte: endDate
-            }
-        });
-      res.json({success: true, bookings});  
-    }catch (error){
-        res.status(500).json({
-            success:false,
-            message: error.message
-        });
-    }
-}) ;
-
 //connection to admin.js
 app.get('/api/admin/bookings', async(req, res) => {
     try {

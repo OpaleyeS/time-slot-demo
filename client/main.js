@@ -168,23 +168,38 @@ function showLoginForm(){
 }
 
 //Form handler for login form
-function handleLogin(){
-  const email = document.getElementById('log-email').value;
-  const name = document.getElementById('log-name').value;
+async function handleLogin(){
+  const email = document.getElementById('log-email').value.trim();
+  const name = document.getElementById('log-name').value.trim();
   const remember = document.getElementById('remember').checked;
+  
+  if(!email || !name){
+    alert('please enter your name and email');
+    return;
+  }
   //Store from data
   formData.login ={ email, name, remember};
 
-  console.log('login attempt:', formData.login);
-
-  console.log('Login attempt:', formData.login);
-  alert('Login functionality would process here');
-
-    //Show booking summary if date n time selected
-    if(selectedDate && selectedTimeSlot){
+  try{
+  const result = await API.loginUser({email, name});
+  if(result.success){
+    formData.registration = {
+      name: result.user.name,
+      email: result.user.email,
+      phone: result.user.phone || " ",
+      agree: true
+    };
+    if(selectDate && selectedTimeSlot){
       showBookingSummary();
     }
-}    
+  }else{
+    alert(`Login failed: ${result.message}`);
+  }
+}catch(error){
+  console.error('Login error:', error);
+  alert('Login error.please try again.');
+}
+}
 
 async function handleRegistration(){//gets inputs from Registrationforms
   const name = document.getElementById('reg-name').value.trim();
